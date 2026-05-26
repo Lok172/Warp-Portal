@@ -8,8 +8,7 @@
 - Window → Package Manager
 - Click +
 - Add package from git URL
-- Paste:
-- `com.unity.cloud.gltfast`
+- Paste: `com.unity.cloud.gltfast`
 
 
 
