@@ -4,8 +4,24 @@ using UnityEngine;
 
 public class PortalTeleport : MonoBehaviour
 {
+    public enum DestinationEnvironment
+    {
+        America,
+        Japan
+    }
+
     [Header("Target Portal")]
     public Transform targetPortal;
+
+    [Header("Destination Music")]
+    public DestinationEnvironment destinationEnvironment;
+    public EnvironmentMusicManager musicManager;
+
+    [Header("Portal Sound")]
+    public AudioSource portalAudio;
+
+    [Header("Fade Transition")]
+    public ScreenFade screenFade;
 
     [Header("Teleport Settings")]
     public float teleportDelay = 0.5f;
@@ -26,31 +42,52 @@ public class PortalTeleport : MonoBehaviour
         GameObject obj = other.gameObject;
 
         if (cooldownMap.TryGetValue(obj, out float t) && Time.time < t)
+        {
             return;
+        }
 
         StartCoroutine(TeleportRoutine(obj));
     }
 
     private IEnumerator TeleportRoutine(GameObject obj)
     {
-        // 先锁CD（防止重复触发）
+        // Lock cooldown to prevent repeated trigger
         cooldownMap[obj] = Time.time + cooldown;
 
-        yield return new WaitForSeconds(teleportDelay);
+        // Play portal sound
+        if (portalAudio != null)
+        {
+            portalAudio.Play();
+        }
+
+        // Fade out before teleport
+        if (screenFade != null)
+        {
+            yield return screenFade.FadeOut();
+        }
+        else
+        {
+            yield return new WaitForSeconds(teleportDelay);
+        }
 
         if (obj == null) yield break;
 
         CharacterController cc = obj.GetComponent<CharacterController>();
 
         // ===============================
-        // 1. 计算出口方向（水平化）
+        // 1. Calculate exit direction
         // ===============================
         Vector3 flatForward = Vector3.ProjectOnPlane(targetPortal.forward, Vector3.up).normalized;
+
+        if (flatForward == Vector3.zero)
+        {
+            flatForward = targetPortal.forward;
+        }
 
         Vector3 basePos = targetPortal.position + flatForward * exitDistance;
 
         // ===============================
-        // 2. 地面修正（防掉地图核心）
+        // 2. Ground correction
         // ===============================
         Vector3 rayOrigin = basePos + Vector3.up * groundRayHeight;
 
@@ -59,21 +96,46 @@ public class PortalTeleport : MonoBehaviour
             basePos = hit.point;
         }
 
-        // 轻微抬高避免穿模
+        // Slightly lift player to avoid clipping
         basePos += Vector3.up * 0.1f;
 
         // ===============================
-        // 3. 传送
+        // 3. Teleport player
         // ===============================
         if (cc != null)
         {
             cc.enabled = false;
+
             obj.transform.position = basePos;
+            obj.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
+
             cc.enabled = true;
         }
         else
         {
             obj.transform.position = basePos;
+            obj.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
+        }
+
+        // ===============================
+        // 4. Change background music
+        // ===============================
+        if (musicManager != null)
+        {
+            if (destinationEnvironment == DestinationEnvironment.America)
+            {
+                musicManager.PlayAmericaMusic();
+            }
+            else if (destinationEnvironment == DestinationEnvironment.Japan)
+            {
+                musicManager.PlayJapanMusic();
+            }
+        }
+
+        // Fade in after teleport
+        if (screenFade != null)
+        {
+            yield return screenFade.FadeIn();
         }
     }
 }
