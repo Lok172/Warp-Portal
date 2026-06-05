@@ -48,7 +48,6 @@ public class ScreenFade : MonoBehaviour
             SetAlpha(alpha);
             yield return null;
         }
-
         SetAlpha(0f);
     }
 

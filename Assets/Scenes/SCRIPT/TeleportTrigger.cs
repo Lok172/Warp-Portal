@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PortalTeleport : MonoBehaviour
 {
@@ -33,6 +34,18 @@ public class PortalTeleport : MonoBehaviour
     public float groundRayDistance = 5f;
     public LayerMask groundMask;
 
+    [Header("Portal Messages")]
+    public TextMeshProUGUI textDisplay;
+
+    [TextArea]
+    public string[] portalMessages;
+
+    public float typingSpeed = 0.05f;
+
+    private int currentMessage = 0;
+    private Coroutine typingCoroutine;
+    public float messageDisplayTime = 3f;
+
     private static Dictionary<GameObject, float> cooldownMap = new Dictionary<GameObject, float>();
 
     private void OnTriggerEnter(Collider other)
@@ -47,6 +60,74 @@ public class PortalTeleport : MonoBehaviour
         }
 
         StartCoroutine(TeleportRoutine(obj));
+    }
+
+    private void PlayNextMessage()
+    {
+        if (portalMessages.Length == 0 || textDisplay == null)
+            return;
+
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeText(portalMessages[currentMessage]));
+
+        currentMessage++;
+
+        if (currentMessage >= portalMessages.Length)
+            currentMessage = 0;
+    }
+
+    private IEnumerator TypeText(string message)
+    {
+        // Start invisible
+        textDisplay.text = "";
+        textDisplay.alpha = 0f;
+
+        // =========================
+        // 1. FADE IN
+        // =========================
+        float fadeInTime = 0.5f;
+        float t = 0f;
+
+        while (t < fadeInTime)
+        {
+            t += Time.deltaTime;
+            textDisplay.alpha = Mathf.Lerp(0f, 1f, t / fadeInTime);
+            yield return null;
+        }
+
+        textDisplay.alpha = 1f;
+
+        // =========================
+        // 2. TYPE TEXT
+        // =========================
+        foreach (char letter in message)
+        {
+            textDisplay.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        // =========================
+        // 3. HOLD TEXT
+        // =========================
+        yield return new WaitForSeconds(messageDisplayTime);
+
+        // =========================
+        // 4. FADE OUT
+        // =========================
+        float fadeOutTime = 0.5f;
+        t = 0f;
+
+        while (t < fadeOutTime)
+        {
+            t += Time.deltaTime;
+            textDisplay.alpha = Mathf.Lerp(1f, 0f, t / fadeOutTime);
+            yield return null;
+        }
+
+        textDisplay.alpha = 0f;
+        textDisplay.text = "";
     }
 
     private IEnumerator TeleportRoutine(GameObject obj)
@@ -131,6 +212,8 @@ public class PortalTeleport : MonoBehaviour
                 musicManager.PlayJapanMusic();
             }
         }
+
+        PlayNextMessage();
 
         // Fade in after teleport
         if (screenFade != null)
