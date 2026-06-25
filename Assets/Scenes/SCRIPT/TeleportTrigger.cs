@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -46,6 +46,15 @@ public class PortalTeleport : MonoBehaviour
     private Coroutine typingCoroutine;
     public float messageDisplayTime = 3f;
 
+    // ── Distance Tracker Integration ──────────────────────────
+    [Header("Distance Tracker")]
+    [Tooltip("Reference to the ItemDistanceTracker in the scene")]
+    public ItemDistanceTracker distanceTracker;
+
+    [Tooltip("Country name to pass to the tracker after this portal teleports (must match TrackedItem.countryName exactly)")]
+    public string destinationCountryName = "Japan";
+
+    // ─────────────────────────────────────────────────────────
     private static Dictionary<GameObject, float> cooldownMap = new Dictionary<GameObject, float>();
 
     private void OnTriggerEnter(Collider other)
@@ -55,70 +64,52 @@ public class PortalTeleport : MonoBehaviour
         GameObject obj = other.gameObject;
 
         if (cooldownMap.TryGetValue(obj, out float t) && Time.time < t)
-        {
             return;
-        }
 
         StartCoroutine(TeleportRoutine(obj));
     }
 
     private void PlayNextMessage()
     {
-        if (portalMessages.Length == 0 || textDisplay == null)
-            return;
+        if (portalMessages.Length == 0 || textDisplay == null) return;
 
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);
 
         typingCoroutine = StartCoroutine(TypeText(portalMessages[currentMessage]));
 
-        currentMessage++;
-
-        if (currentMessage >= portalMessages.Length)
-            currentMessage = 0;
+        currentMessage = (currentMessage + 1) % portalMessages.Length;
     }
 
     private IEnumerator TypeText(string message)
     {
-        // Start invisible
         textDisplay.text = "";
         textDisplay.alpha = 0f;
 
-        // =========================
-        // 1. FADE IN
-        // =========================
+        // Fade in
         float fadeInTime = 0.5f;
         float t = 0f;
-
         while (t < fadeInTime)
         {
             t += Time.deltaTime;
             textDisplay.alpha = Mathf.Lerp(0f, 1f, t / fadeInTime);
             yield return null;
         }
-
         textDisplay.alpha = 1f;
 
-        // =========================
-        // 2. TYPE TEXT
-        // =========================
+        // Type
         foreach (char letter in message)
         {
             textDisplay.text += letter;
             yield return new WaitForSeconds(typingSpeed);
         }
 
-        // =========================
-        // 3. HOLD TEXT
-        // =========================
+        // Hold
         yield return new WaitForSeconds(messageDisplayTime);
 
-        // =========================
-        // 4. FADE OUT
-        // =========================
+        // Fade out
         float fadeOutTime = 0.5f;
         t = 0f;
-
         while (t < fadeOutTime)
         {
             t += Time.deltaTime;
@@ -132,93 +123,56 @@ public class PortalTeleport : MonoBehaviour
 
     private IEnumerator TeleportRoutine(GameObject obj)
     {
-        // Lock cooldown to prevent repeated trigger
         cooldownMap[obj] = Time.time + cooldown;
 
-        // Play portal sound
-        if (portalAudio != null)
-        {
-            portalAudio.Play();
-        }
+        if (portalAudio != null) portalAudio.Play();
 
-        // Fade out before teleport
         if (screenFade != null)
-        {
             yield return screenFade.FadeOut();
-        }
         else
-        {
             yield return new WaitForSeconds(teleportDelay);
-        }
 
         if (obj == null) yield break;
 
         CharacterController cc = obj.GetComponent<CharacterController>();
 
-        // ===============================
-        // 1. Calculate exit direction
-        // ===============================
+        // ── 1. Exit direction ─────────────────────────────────
         Vector3 flatForward = Vector3.ProjectOnPlane(targetPortal.forward, Vector3.up).normalized;
-
-        if (flatForward == Vector3.zero)
-        {
-            flatForward = targetPortal.forward;
-        }
+        if (flatForward == Vector3.zero) flatForward = targetPortal.forward;
 
         Vector3 basePos = targetPortal.position + flatForward * exitDistance;
 
-        // ===============================
-        // 2. Ground correction
-        // ===============================
+        // ── 2. Ground correction ──────────────────────────────
         Vector3 rayOrigin = basePos + Vector3.up * groundRayHeight;
-
         if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, groundRayDistance, groundMask))
-        {
             basePos = hit.point;
-        }
 
-        // Slightly lift player to avoid clipping
         basePos += Vector3.up * 0.1f;
 
-        // ===============================
-        // 3. Teleport player
-        // ===============================
-        if (cc != null)
-        {
-            cc.enabled = false;
+        // ── 3. Move player ────────────────────────────────────
+        if (cc != null) cc.enabled = false;
 
-            obj.transform.position = basePos;
-            obj.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
+        obj.transform.position = basePos;
+        obj.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
 
-            cc.enabled = true;
-        }
-        else
-        {
-            obj.transform.position = basePos;
-            obj.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
-        }
+        if (cc != null) cc.enabled = true;
 
-        // ===============================
-        // 4. Change background music
-        // ===============================
+        // ── 4. Music ──────────────────────────────────────────
         if (musicManager != null)
         {
             if (destinationEnvironment == DestinationEnvironment.America)
-            {
                 musicManager.PlayAmericaMusic();
-            }
             else if (destinationEnvironment == DestinationEnvironment.Japan)
-            {
                 musicManager.PlayJapanMusic();
-            }
         }
+
+        // ── 5. Switch tracker to destination country ──────────
+        if (distanceTracker != null && !string.IsNullOrEmpty(destinationCountryName))
+            distanceTracker.SwitchToCountry(destinationCountryName);
 
         PlayNextMessage();
 
-        // Fade in after teleport
         if (screenFade != null)
-        {
             yield return screenFade.FadeIn();
-        }
     }
 }

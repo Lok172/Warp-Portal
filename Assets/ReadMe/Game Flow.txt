@@ -1,0 +1,36 @@
+﻿Mini Activities for each country (Japan, America)
+1) Find three objects in each country that represent their culture or lifestyle. Done
+2) Once found, it show a fact board of those objects.
+3) Approach to the landmarks to display the fact board
+4) Once they found the all objects and visit the landmarks, they will have to answer a quiz about the objects and landmarks they found in each country.
+5) One quiz will have 3 to 5 questions about the objects and landmarks in each country.
+6) If the player answers all questions correctly, play SFX and they will receive a reward which shows at the end of the visit
+(e.g., a badge or points).
+7) If the player answers any question incorrectly, play incorrect SFX and prompt them to review the fact board again before attempting the quiz again.
+8) After completing the quiz for one country, the player can move on to the next country and repeat the process.
+9) The game will track the player's progress and provide feedback on their performance after each quiz.
+10) At the end of the game, the player will receive a summary :
+Countries Visited
+
+✅ Japan		✅ America	
+
+Objects Collected
+Japan				America
+⛩️ Torii Gate		⚾ Baseball
+🍣 Sushi			🦅 Bald Eagle
+🌸 Sakura Tree		🍔 Hamburger
+
+Landmarks Visited
+Japan				America
+🗼Tokyo Tower		🗽 Statue of Liberty
+
+Quiz Performance
+Japan				America
+✔ Correct: 5/5	  ✔ Correct: 4/5	
+
+Total Correct: 9/10
+
+
+	
+
+
