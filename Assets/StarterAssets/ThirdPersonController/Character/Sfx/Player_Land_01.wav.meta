@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: b13fd8dee3cf44c40859bf6c987bf68c
+guid: f7cdee10a6d829742b06ba215d82cf51
 AudioImporter:
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 8
   defaultSettings:
     serializedVersion: 2
     loadType: 0
@@ -21,11 +21,3 @@ AudioImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 196526
-  packageName: Starter Assets - ThirdPerson | Updates in new CharacterController
-    package
-  packageVersion: 1.1.7
-  assetPath: Assets/StarterAssets/ThirdPersonController/Character/Sfx/Player_Land_01.wav
-  uploadId: 879174
