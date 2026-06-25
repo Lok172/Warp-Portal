@@ -335,4 +335,4 @@ public class ItemDistanceTracker : MonoBehaviour
         if (screenFade == null)
             Debug.LogWarning("[ItemDistanceTracker] 'Screen Fade' not assigned — text fade will use default 0.3s.");
     }
-}
+}   
