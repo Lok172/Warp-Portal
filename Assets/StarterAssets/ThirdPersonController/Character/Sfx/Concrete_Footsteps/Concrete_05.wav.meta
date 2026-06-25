@@ -1,10 +1,8 @@
 fileFormatVersion: 2
-guid: 1834ec69586af4bccb2b0595d9065d3e
-labels:
-- Footstep
+guid: 7574cce85e6cd14409f23cdc63e1a797
 AudioImporter:
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 8
   defaultSettings:
     serializedVersion: 2
     loadType: 0
@@ -23,11 +21,3 @@ AudioImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 196526
-  packageName: Starter Assets - ThirdPerson | Updates in new CharacterController
-    package
-  packageVersion: 1.1.7
-  assetPath: Assets/StarterAssets/ThirdPersonController/Character/Sfx/Concrete_Footsteps/Concrete_05.wav
-  uploadId: 879174
