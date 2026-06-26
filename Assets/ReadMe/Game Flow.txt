@@ -1,8 +1,8 @@
 ﻿Mini Activities for each country (Japan, America)
-1) Find three objects in each country that represent their culture or lifestyle. Done
-2) Once found, it show a fact board of those objects.
-3) Approach to the landmarks to display the fact board
-4) Once they found the all objects and visit the landmarks, they will have to answer a quiz about the objects and landmarks they found in each country.
+1) Find three objects in each country that represent their culture or lifestyle. ✔
+2) Once found, it show a fact board of those objects. ✔
+3) Approach to the landmarks to display the fact board ✔
+4) Once they found the all objects and visit the landmarks, they will have to answer a quiz about the objects and landmarks they found in each country.✔
 5) One quiz will have 3 to 5 questions about the objects and landmarks in each country.
 6) If the player answers all questions correctly, play SFX and they will receive a reward which shows at the end of the visit
 (e.g., a badge or points).
@@ -31,6 +31,57 @@ Japan				America
 Total Correct: 9/10
 
 
-	
 
+*还没做的：
+1. Update每个item的description（New System → Japan Item / America Item → xx Item）
+2. SFX 
+3. 题库
+4. summary
+
+*添加题库和音效指南*
+	
+第一部分：如何添加题库
+1. 找到管理器：
+在 Unity 左侧的 Hierarchy（层级）面板中，找到并选中名为 QuizManager 的空物体。
+
+2. 添加国家：
+看右侧的 Inspector（属性）面板，找到 Quiz Database 栏目下的 All Quizzes。
+
+点击右下角的 + 号，添加一个新的国家。
+
+Country Name：填入国家的英文名（⚠️注意：大小写必须和程序设定的完全一致，例如 Japan 或 America）。
+
+3. 添加题目与选项：
+展开你刚刚创建的国家，找到 Questions，点击 + 号添加题目（建议每个国家 3~5 题）。
+
+Question：在这里直接输入题目内容（例如：“日本的最高塔是？”）。
+
+Options：展开后点击 + 号添加选项，分别输入选项的具体文字（可以设 3 到 4 个选项）。
+
+Correct Answer Index：填写正确答案的序号。
+
+🚨 【非常重要】：程序的序号是从 0 开始计算的！
+
+如果第 1 个选项是正确答案，填 0
+
+如果第 2 个选项是正确答案，填 1
+
+如果第 3 个选项是正确答案，填 2
+
+如果第 4 个选项是正确答案，填 3
+
+🎵 第二部分：如何添加音效
+1. 准备音效文件：
+确保你的答对和答错音效（.mp3 或 .wav 格式）已经导入到了 Unity 底部的 Project 文件夹中。
+
+2. 拖入对应插槽：
+依然是选中 QuizManager 物体，在右侧 Inspector 面板中往下看，找到 Audio (SFX) 区域：
+
+Correct SFX：将“答对”的音效文件拖拽到这个插槽里。
+
+Incorrect SFX：将“答错”的音效文件拖拽到这个插槽里。
+
+(注：Audio Source 程序的底层已经配置好，只要把音效文件拖进去，玩家答题时就会自动播放了。)
+
+配置完成后，记得 Ctrl + S 保存当前场景 (Scene)！如果有任何不清楚的地方随时沟通。
 
