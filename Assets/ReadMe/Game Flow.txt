@@ -3,13 +3,13 @@
 2) Once found, it show a fact board of those objects. ✔
 3) Approach to the landmarks to display the fact board ✔
 4) Once they found the all objects and visit the landmarks, they will have to answer a quiz about the objects and landmarks they found in each country.✔
-5) One quiz will have 3 to 5 questions about the objects and landmarks in each country.
+5) One quiz will have 3 to 5 questions about the objects and landmarks in each country. ✔
 6) If the player answers all questions correctly, play SFX and they will receive a reward which shows at the end of the visit
-(e.g., a badge or points).
-7) If the player answers any question incorrectly, play incorrect SFX and prompt them to review the fact board again before attempting the quiz again.
-8) After completing the quiz for one country, the player can move on to the next country and repeat the process.
-9) The game will track the player's progress and provide feedback on their performance after each quiz.
-10) At the end of the game, the player will receive a summary :
+(e.g., a badge or points). ✔
+7) If the player answers any question incorrectly, play incorrect SFX and prompt them to review the fact board again before attempting the quiz again.做了一半罢了，还没有音效
+8) After completing the quiz for one country, the player can move on to the next country and repeat the process. ✔
+9) The game will track the player's progress and provide feedback on their performance after each quiz.✔
+10) At the end of the game, the player will receive a summary :✔✔✔
 Countries Visited
 
 ✅ Japan		✅ America	
@@ -33,10 +33,13 @@ Total Correct: 9/10
 
 
 *还没做的：
-1. Update每个item的description（New System → Japan Item / America Item → xx Item）
-2. SFX 
-3. 题库
-4. summary
+1. Update每个item的description（New System → Japan Item / America Item → xx Item）Done by Chu
+2. SFX - Not Yet
+3. 题库 -  Done by Chu, each country 3 questions
+4. summary - Done by Chu 了吧， 不满意可以去换
+
+
+
 
 *添加题库和音效指南*
 	

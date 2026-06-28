@@ -40,45 +40,138 @@ public class PortalTeleport : MonoBehaviour
     [TextArea]
     public string[] portalMessages;
 
-    public float typingSpeed = 0.05f;
+    public float typingSpeed = 0.02f;
+    public float messageDisplayTime = 2.5f;
+
+    [Header("Distance Tracker")]
+    public ItemDistanceTracker distanceTracker;
+    public string destinationCountryName = "Japan";
+
+    [Header("Progress Gate")]
+    public bool requireCountryCompletionBeforeTeleport = false;
+    public string requiredCountryName = "Japan";
+
+    [TextArea(2, 4)]
+    public string lockedMessage = "Please complete Japan first: collect all cultural items and pass the quiz before entering America.";
+
+    public bool useAutoRequirementMessage = true;
+
+    [Header("Locked Notification")]
+    public bool useFactPanelForLockedNotification = true;
+    public string lockedPanelTitle = "Portal Locked";
 
     private int currentMessage = 0;
     private Coroutine typingCoroutine;
-    public float messageDisplayTime = 3f;
 
-    // ── Distance Tracker Integration ──────────────────────────
-    [Header("Distance Tracker")]
-    [Tooltip("Reference to the ItemDistanceTracker in the scene")]
-    public ItemDistanceTracker distanceTracker;
-
-    [Tooltip("Country name to pass to the tracker after this portal teleports (must match TrackedItem.countryName exactly)")]
-    public string destinationCountryName = "Japan";
-
-    // ─────────────────────────────────────────────────────────
     private static Dictionary<GameObject, float> cooldownMap = new Dictionary<GameObject, float>();
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
-
-        GameObject obj = other.gameObject;
-
-        if (cooldownMap.TryGetValue(obj, out float t) && Time.time < t)
+        if (!other.CompareTag("Player"))
+        {
             return;
+        }
 
-        StartCoroutine(TeleportRoutine(obj));
+        GameObject playerObject = other.gameObject;
+
+        if (cooldownMap.TryGetValue(playerObject, out float cooldownEndTime) && Time.time < cooldownEndTime)
+        {
+            return;
+        }
+
+        cooldownMap[playerObject] = Time.time + cooldown;
+
+        if (!CanUsePortal())
+        {
+            ShowLockedNotification();
+            return;
+        }
+
+        StartCoroutine(TeleportRoutine(playerObject));
+    }
+
+    private bool CanUsePortal()
+    {
+        if (!requireCountryCompletionBeforeTeleport)
+        {
+            return true;
+        }
+
+        GameProgressManager progressManager = GameProgressManager.Instance;
+
+        if (progressManager == null)
+        {
+            progressManager = Object.FindFirstObjectByType<GameProgressManager>();
+        }
+
+        if (progressManager == null)
+        {
+            Debug.LogWarning("[PortalTeleport] GameProgressManager not found. Portal is locked.");
+            return false;
+        }
+
+        return progressManager.IsCountryCompleted(requiredCountryName);
+    }
+
+    private void ShowLockedNotification()
+    {
+        string messageToShow = lockedMessage;
+
+        if (useAutoRequirementMessage)
+        {
+            GameProgressManager progressManager = GameProgressManager.Instance;
+
+            if (progressManager == null)
+            {
+                progressManager = Object.FindFirstObjectByType<GameProgressManager>();
+            }
+
+            if (progressManager != null)
+            {
+                string autoMessage = progressManager.GetMissingRequirementMessage(requiredCountryName);
+
+                if (!string.IsNullOrEmpty(autoMessage))
+                {
+                    messageToShow = autoMessage;
+                }
+            }
+        }
+
+        if (useFactPanelForLockedNotification && FactPanelManager.Instance != null)
+        {
+            FactPanelManager.Instance.ShowFact(lockedPanelTitle, messageToShow);
+            return;
+        }
+
+        ShowMessage(messageToShow);
     }
 
     private void PlayNextMessage()
     {
-        if (portalMessages.Length == 0 || textDisplay == null) return;
+        if (portalMessages == null || portalMessages.Length == 0)
+        {
+            return;
+        }
 
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-
-        typingCoroutine = StartCoroutine(TypeText(portalMessages[currentMessage]));
+        ShowMessage(portalMessages[currentMessage]);
 
         currentMessage = (currentMessage + 1) % portalMessages.Length;
+    }
+
+    private void ShowMessage(string message)
+    {
+        if (textDisplay == null)
+        {
+            Debug.Log(message);
+            return;
+        }
+
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
+
+        typingCoroutine = StartCoroutine(TypeText(message));
     }
 
     private IEnumerator TypeText(string message)
@@ -86,30 +179,36 @@ public class PortalTeleport : MonoBehaviour
         textDisplay.text = "";
         textDisplay.alpha = 0f;
 
-        // Fade in
-        float fadeInTime = 0.5f;
+        float fadeInTime = 0.3f;
         float t = 0f;
+
         while (t < fadeInTime)
         {
             t += Time.deltaTime;
             textDisplay.alpha = Mathf.Lerp(0f, 1f, t / fadeInTime);
             yield return null;
         }
+
         textDisplay.alpha = 1f;
 
-        // Type
-        foreach (char letter in message)
+        if (typingSpeed <= 0f)
         {
-            textDisplay.text += letter;
-            yield return new WaitForSeconds(typingSpeed);
+            textDisplay.text = message;
+        }
+        else
+        {
+            foreach (char letter in message)
+            {
+                textDisplay.text += letter;
+                yield return new WaitForSeconds(typingSpeed);
+            }
         }
 
-        // Hold
         yield return new WaitForSeconds(messageDisplayTime);
 
-        // Fade out
-        float fadeOutTime = 0.5f;
+        float fadeOutTime = 0.3f;
         t = 0f;
+
         while (t < fadeOutTime)
         {
             t += Time.deltaTime;
@@ -121,58 +220,87 @@ public class PortalTeleport : MonoBehaviour
         textDisplay.text = "";
     }
 
-    private IEnumerator TeleportRoutine(GameObject obj)
+    private IEnumerator TeleportRoutine(GameObject playerObject)
     {
-        cooldownMap[obj] = Time.time + cooldown;
-
-        if (portalAudio != null) portalAudio.Play();
+        if (portalAudio != null)
+        {
+            portalAudio.Play();
+        }
 
         if (screenFade != null)
+        {
             yield return screenFade.FadeOut();
+        }
         else
+        {
             yield return new WaitForSeconds(teleportDelay);
+        }
 
-        if (obj == null) yield break;
+        if (playerObject == null)
+        {
+            yield break;
+        }
 
-        CharacterController cc = obj.GetComponent<CharacterController>();
+        if (targetPortal == null)
+        {
+            Debug.LogError("[PortalTeleport] Target Portal is not assigned.");
+            yield break;
+        }
 
-        // ── 1. Exit direction ─────────────────────────────────
+        CharacterController characterController = playerObject.GetComponent<CharacterController>();
+
         Vector3 flatForward = Vector3.ProjectOnPlane(targetPortal.forward, Vector3.up).normalized;
-        if (flatForward == Vector3.zero) flatForward = targetPortal.forward;
 
-        Vector3 basePos = targetPortal.position + flatForward * exitDistance;
+        if (flatForward == Vector3.zero)
+        {
+            flatForward = targetPortal.forward;
+        }
 
-        // ── 2. Ground correction ──────────────────────────────
-        Vector3 rayOrigin = basePos + Vector3.up * groundRayHeight;
+        Vector3 basePosition = targetPortal.position + flatForward * exitDistance;
+        Vector3 rayOrigin = basePosition + Vector3.up * groundRayHeight;
+
         if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, groundRayDistance, groundMask))
-            basePos = hit.point;
+        {
+            basePosition = hit.point;
+        }
 
-        basePos += Vector3.up * 0.1f;
+        basePosition += Vector3.up * 0.1f;
 
-        // ── 3. Move player ────────────────────────────────────
-        if (cc != null) cc.enabled = false;
+        if (characterController != null)
+        {
+            characterController.enabled = false;
+        }
 
-        obj.transform.position = basePos;
-        obj.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
+        playerObject.transform.position = basePosition;
+        playerObject.transform.rotation = Quaternion.LookRotation(flatForward, Vector3.up);
 
-        if (cc != null) cc.enabled = true;
+        if (characterController != null)
+        {
+            characterController.enabled = true;
+        }
 
-        // ── 4. Music ──────────────────────────────────────────
         if (musicManager != null)
         {
             if (destinationEnvironment == DestinationEnvironment.America)
+            {
                 musicManager.PlayAmericaMusic();
+            }
             else if (destinationEnvironment == DestinationEnvironment.Japan)
+            {
                 musicManager.PlayJapanMusic();
+            }
         }
 
-        // ── 5. Switch tracker to destination country ──────────
         if (distanceTracker != null && !string.IsNullOrEmpty(destinationCountryName))
+        {
             distanceTracker.SwitchToCountry(destinationCountryName);
+        }
 
         PlayNextMessage();
 
         if (screenFade != null)
+        {
             yield return screenFade.FadeIn();
+        }
     }
 }

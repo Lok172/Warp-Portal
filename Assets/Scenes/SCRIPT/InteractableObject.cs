@@ -5,103 +5,168 @@ public class InteractableObject : MonoBehaviour
 {
     [Header("Fact Board Info")]
     public string objectTitle;
+
     [TextArea(3, 5)]
     public string objectDescription;
 
     [Header("Settings")]
     public bool isLandmark = false;
-    [Tooltip("如果是地标，必须填入所属国家的名字（例如 Japan），用于核对物品是否找齐")]
+
+    [Tooltip("Only required for landmark. Must match country name in ItemDistanceTracker and QuizManager.")]
     public string countryName;
 
     private bool _hasBeenTriggered = false;
 
-    private void Update()
+    private void Awake()
     {
-        var autoCollector = GetComponent("ProximityCollector") as MonoBehaviour;
-        if (autoCollector != null && autoCollector.enabled)
+        Collider collider = GetComponent<Collider>();
+
+        if (collider != null && !collider.isTrigger)
         {
-            autoCollector.enabled = false;
+            Debug.LogWarning($"{gameObject.name}: Collider should be set to Is Trigger.");
+        }
+
+        ProximityCollector proximityCollector = GetComponent<ProximityCollector>();
+
+        if (proximityCollector != null)
+        {
+            proximityCollector.enabled = false;
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !_hasBeenTriggered)
+        if (!other.CompareTag("Player"))
         {
-            _hasBeenTriggered = true;
+            return;
+        }
 
-            if (isLandmark)
+        if (_hasBeenTriggered)
+        {
+            return;
+        }
+
+        _hasBeenTriggered = true;
+
+        if (FactPanelManager.Instance == null)
+        {
+            Debug.LogError("FactPanelManager not found in scene.");
+            _hasBeenTriggered = false;
+            return;
+        }
+
+        if (isLandmark)
+        {
+            HandleLandmark();
+        }
+        else
+        {
+            HandleCollectibleItem();
+        }
+    }
+
+    private void HandleCollectibleItem()
+    {
+        FactPanelManager.Instance.ShowFact(objectTitle, objectDescription, () =>
+        {
+            MarkItemAsFoundOnly();
+            _hasBeenTriggered = false;
+        });
+    }
+
+    private void HandleLandmark()
+    {
+        bool allItemsFound = CheckAllItemsFound();
+
+        if (allItemsFound)
+        {
+            FactPanelManager.Instance.ShowFact(objectTitle, objectDescription, () =>
             {
-                // 如果是地标，先去查一下这个国家的物品是不是全收集了
-                bool allItemsFound = CheckAllItemsFound();
-
-                if (allItemsFound)
+                if (QuizManager.Instance != null)
                 {
-                    // 全收集了：显示地标科普，并在玩家点击"Close"的瞬间，触发 Quiz！
-                    FactPanelManager.Instance.ShowFact(objectTitle, objectDescription, () =>
-                    {
-                        QuizManager.Instance.StartQuiz(countryName);
-                        _hasBeenTriggered = false; // 答错后还可以回来重新触发
-                    });
+                    QuizManager.Instance.StartQuiz(countryName);
                 }
                 else
                 {
-                    // 没收集完：只显示科普，关闭后无事发生
-                    FactPanelManager.Instance.ShowFact(objectTitle, objectDescription);
-                    _hasBeenTriggered = false; // 允许玩家反复查看
+                    Debug.LogError("QuizManager not found in scene.");
                 }
-            }
-            else
+
+                _hasBeenTriggered = false;
+            });
+        }
+        else
+        {
+            FactPanelManager.Instance.ShowFact(objectTitle, objectDescription, () =>
             {
-                // 如果是普通收集物，显示科普并销毁
-                FactPanelManager.Instance.ShowFact(objectTitle, objectDescription);
-                DestroyAndNotifyTracker();
-            }
+                _hasBeenTriggered = false;
+            });
         }
     }
 
-    // 核心逻辑：去距离追踪器里查数据
     private bool CheckAllItemsFound()
     {
-        if (string.IsNullOrEmpty(countryName)) return false;
+        if (string.IsNullOrEmpty(countryName))
+        {
+            return false;
+        }
 
         ItemDistanceTracker tracker = Object.FindFirstObjectByType<ItemDistanceTracker>();
-        if (tracker != null)
+
+        if (tracker == null)
         {
-            foreach (var country in tracker.countries)
+            return false;
+        }
+
+        foreach (var country in tracker.countries)
+        {
+            if (country.countryName != countryName)
             {
-                if (country.countryName == this.countryName)
+                continue;
+            }
+
+            if (country.items == null)
+            {
+                return false;
+            }
+
+            foreach (var item in country.items)
+            {
+                if (!item.isFound)
                 {
-                    foreach (var item in country.items)
-                    {
-                        // 只要有任何一个物品没找到，就不达标
-                        if (!item.isFound) return false;
-                    }
-                    return true; // 循环结束还没 return false，说明全找到了！
+                    return false;
                 }
             }
+
+            return true;
         }
+
         return false;
     }
 
-    private void DestroyAndNotifyTracker()
+    private void MarkItemAsFoundOnly()
     {
         ItemDistanceTracker tracker = Object.FindFirstObjectByType<ItemDistanceTracker>();
-        if (tracker != null)
+
+        if (tracker == null)
         {
-            foreach (var country in tracker.countries)
+            return;
+        }
+
+        foreach (var country in tracker.countries)
+        {
+            if (country.items == null)
             {
-                if (country.items == null) continue;
-                foreach (var item in country.items)
+                continue;
+            }
+
+            foreach (var item in country.items)
+            {
+                if (item.itemTransform == this.transform)
                 {
-                    if (item.itemTransform == this.transform)
-                    {
-                        tracker.MarkFound(country.countryName, item.label);
-                        return;
-                    }
+                    tracker.MarkFound(country.countryName, item.label);
+                    return;
                 }
             }
         }
-        Destroy(gameObject);
     }
 }
