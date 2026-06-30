@@ -1030,6 +1030,7 @@ MonoBehaviour:
     modern city culture."
   isLandmark: 1
   countryName: Japan
+  collisionSound: {fileID: 8300000, guid: db5f5818f345569448c3f4699d8a2c35, type: 3}
 --- !u!65 &217925852
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1691,6 +1692,7 @@ GameObject:
   - component: {fileID: 353302214}
   - component: {fileID: 353302213}
   - component: {fileID: 353302217}
+  - component: {fileID: 353302218}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1710,7 +1712,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
+  m_IgnoreReversedGraphics: 0
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
@@ -1806,6 +1808,22 @@ MonoBehaviour:
   descriptionText: {fileID: 2085399988}
   closeButton: {fileID: 0}
   animationDuration: 0.25
+--- !u!114 &353302218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 353302212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd6ed9695faf1224692db864680a5fa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSound
+  defaultClickSound: {fileID: 8300000, guid: db5f5818f345569448c3f4699d8a2c35, type: 3}
+  closeSound: {fileID: 8300000, guid: c305cd39e5827794e83362d9558d92e5, type: 3}
+  volume: 1
+  pitch: 1.5
 --- !u!1001 &379892151
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2356,6 +2374,18 @@ MonoBehaviour:
       - m_Target: {fileID: 353302217}
         m_TargetAssemblyTypeName: FactPanelManager, Assembly-CSharp
         m_MethodName: ClosePanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 353302218}
+        m_TargetAssemblyTypeName: ButtonSound, Assembly-CSharp
+        m_MethodName: PlayCloseSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3233,7 +3263,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8002264680419333305, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1003049251}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1849230298}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1001 &670825966
 PrefabInstance:
@@ -3432,6 +3465,7 @@ MonoBehaviour:
     culture and careful presentation."
   isLandmark: 0
   countryName: 
+  collisionSound: {fileID: 8300000, guid: db5f5818f345569448c3f4699d8a2c35, type: 3}
 --- !u!1 &691282412 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3750194987115815383, guid: a24fd0a98c867654da4ea69b41c7ad97, type: 3}
@@ -3689,6 +3723,7 @@ MonoBehaviour:
     bloom only for a short time.
   isLandmark: 0
   countryName: 
+  collisionSound: {fileID: 8300000, guid: db5f5818f345569448c3f4699d8a2c35, type: 3}
 --- !u!1 &766637067
 GameObject:
   m_ObjectHideFlags: 0
@@ -4264,6 +4299,7 @@ GameObject:
   m_Component:
   - component: {fileID: 917943936}
   - component: {fileID: 917943937}
+  - component: {fileID: 917943938}
   m_Layer: 0
   m_Name: QuizManager
   m_TagString: Untagged
@@ -4354,14 +4390,111 @@ MonoBehaviour:
   - {fileID: 1951567845}
   - {fileID: 2114296638}
   - {fileID: 2010810021}
-  audioSource: {fileID: 0}
-  correctSFX: {fileID: 0}
-  incorrectSFX: {fileID: 0}
+  audioSource: {fileID: 917943938}
+  correctSFX: {fileID: 8300000, guid: db5f5818f345569448c3f4699d8a2c35, type: 3}
+  incorrectSFX: {fileID: 8300000, guid: a254dedc6e719df45a3a7f326e166d54, type: 3}
   animationDuration: 0.25
   wrongAnswerMessage: Incorrect! Please review the fact board and try again.
   wrongAnswerDisplayTime: 2
   passQuizMessage: Great job! You passed this country's quiz.
   passMessageDisplayTime: 2
+--- !u!82 &917943938
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917943935}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &927059369
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5796,6 +5929,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1156627405}
   m_CullTransparentMesh: 1
+--- !u!1 &1168274487 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+  m_PrefabInstance: {fileID: 664301631}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1177104330
 GameObject:
   m_ObjectHideFlags: 0
@@ -5862,6 +6000,18 @@ MonoBehaviour:
       - m_Target: {fileID: 353302217}
         m_TargetAssemblyTypeName: FactPanelManager, Assembly-CSharp
         m_MethodName: ClosePanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 353302218}
+        m_TargetAssemblyTypeName: ButtonSound, Assembly-CSharp
+        m_MethodName: PlayCloseSound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6216,6 +6366,7 @@ MonoBehaviour:
     and entertainment."
   isLandmark: 0
   countryName: 
+  collisionSound: {fileID: 0}
 --- !u!65 &1230154859
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6527,6 +6678,7 @@ MonoBehaviour:
     with fast food culture and casual dining in the United States.
   isLandmark: 0
   countryName: 
+  collisionSound: {fileID: 0}
 --- !u!65 &1277188198
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9568,6 +9720,27 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
   m_PrefabInstance: {fileID: 664301631}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &1849230298
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1168274487}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1853512475 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4664847476396351788, guid: d32b0b33b3dd3c84ea01c15c88eb0c1e, type: 3}
@@ -9612,6 +9785,7 @@ MonoBehaviour:
     a sacred space.
   isLandmark: 0
   countryName: 
+  collisionSound: {fileID: 8300000, guid: db5f5818f345569448c3f4699d8a2c35, type: 3}
 --- !u!1 &1877843186
 GameObject:
   m_ObjectHideFlags: 0
@@ -9885,6 +10059,7 @@ MonoBehaviour:
     represents freedom, strength, and independence.
   isLandmark: 0
   countryName: 
+  collisionSound: {fileID: 0}
 --- !u!65 &1914892000
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11505,6 +11680,7 @@ MonoBehaviour:
     freedom and was a gift from France to the United States.
   isLandmark: 1
   countryName: America
+  collisionSound: {fileID: 0}
 --- !u!1 &2109632701
 GameObject:
   m_ObjectHideFlags: 0

@@ -34,7 +34,7 @@ Total Correct: 9/10
 
 *还没做的：
 1. Update每个item的description（New System → Japan Item / America Item → xx Item）Done by Chu
-2. SFX - Not Yet
+2. SFX - Done Goo
 3. 题库 -  Done by Chu, each country 3 questions
 4. summary - Done by Chu 了吧， 不满意可以去换
 

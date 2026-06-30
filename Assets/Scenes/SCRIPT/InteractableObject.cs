@@ -17,6 +17,22 @@ public class InteractableObject : MonoBehaviour
 
     private bool _hasBeenTriggered = false;
 
+    [Header("物体互动声音")]
+    public AudioClip collisionSound;  // 在Inspector里拖入你想要的声音文件
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        // 获取或添加一个AudioSource组件
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        // 设置这个声音为3D音效，这样听起来会从物体位置发出
+        audioSource.spatialBlend = 100f;
+    }
+
     private void Awake()
     {
         Collider collider = GetComponent<Collider>();
@@ -44,6 +60,11 @@ public class InteractableObject : MonoBehaviour
         if (_hasBeenTriggered)
         {
             return;
+        }
+
+        if (other.gameObject.CompareTag("Player") && collisionSound != null)
+        {
+            audioSource.PlayOneShot(collisionSound);
         }
 
         _hasBeenTriggered = true;
