@@ -1,11 +1,15 @@
-# Warp Portal
+# Travel and Culture Explorer
 
 ## Overview
-This Portal project uses Unity and Shader Graph to create immersive portal effects, interactive teleportation, visual transitions, audio cues, and seamless travel between two distinct virtual environments.
+Travel and Culture Explorer is a third-person 3D educational adventure game developed in Unity. Players travel through portals to explore two different countries: Japan and America.
+
+In each country, players discover cultural objects, visit famous landmarks, read fact boards, and complete quizzes based on what they have learned. The project combines exploration, cultural learning, interactive activities, and portal-based travel.
+
 
 ## Tech Stack
 - C#
 - Unity
+- Shader Graph
 - Visual Studio
 
 ## Controls
@@ -29,6 +33,6 @@ This Portal project uses Unity and Shader Graph to create immersive portal effec
     - Type `Cinemachine` and install 
 
 ## Demo 
-Demo video available on YouTube: https://youtu.be/8nCTk4Tk9po?si=8snaHT1iwMRMjn29 
+Demo video available on YouTube: https://youtu.be/A22gfgUq3FQ
 
 
